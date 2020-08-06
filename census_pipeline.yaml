@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: census-keras-training-
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 0.5.1, pipelines.kubeflow.org/pipeline_compilation_time: '2020-08-06T09:19:05.994874',
+    pipelines.kubeflow.org/pipeline_spec: '{"description": "The pipeline training
+      a census model.", "inputs": [{"name": "project_id"}, {"name": "region"}], "name":
+      "Census Keras Training"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 0.5.1}
+spec:
+  entrypoint: census-keras-training
+  templates:
+  - name: census-keras-training
+    dag:
+      tasks:
+      - {name: census-training-component, template: census-training-component}
+  - name: census-training-component
+    container: {image: 'gcr.io/camus-mlops/census-keras@sha256:6a088a18f22b244bcf753c8f7327d489ed4b844e0a19694b8afc649f8c78d1b3'}
+    metadata:
+      labels: {pipelines.kubeflow.org/pipeline-sdk-type: kfp}
+  arguments:
+    parameters:
+    - {name: project_id}
+    - {name: region}
+  serviceAccountName: pipeline-runner
